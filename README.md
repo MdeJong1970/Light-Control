@@ -3,6 +3,12 @@ New Light Control
 
 This is the first prototype of my own Light Control.
 
+top view of the board
+![top view of the board](https://github.com/MdeJong1970/Light-Control/blob/main/Pictures/LightControlTop.png)
+
+bottom view of the board
+![bottom view of the board](https://github.com/MdeJong1970/Light-Control/blob/main/Pictures/LightControlBottom.png)
+
 The size is 30mm x 70mm.
 
 ## Used components:
