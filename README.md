@@ -35,6 +35,14 @@ The size is 30mm x 70mm.
 - pin D9  - Steering channel
 - pin D10 - HeadLight channel 
 
+## Small holder for the board
+
+![Small holdder for the board](https://github.com/MdeJong1970/Light-Control/blob/main/Holder/Light-Control-Holder.png)
+
+Designed with OpenSCAD (scad file available), STL file available.
+
+To be used with brass thread inserts M2, outer diameter 3.2 mm, max length 5mm.
+
 
 The schematic will follow.
 First version of the firmware.
