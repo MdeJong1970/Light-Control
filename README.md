@@ -1,7 +1,15 @@
 # Light-Control
 New Light Control
 
-This is the first prototype of my own Light Control.
+The board and the LEDs are powered by the servo connection.
+
+The LEDs have a common power connection
+
+The current software has the following functions:
+- HeadLight, TailLeft & TailRight LEDs on/off, controlled with the LIGHT CRTL SERVO channel
+- Blinking of the TurnLeft & TurnRight LEDs, controlled with the STEER SERVO channel
+- ReverseLight LEDs switched on when driving backwards, controlled with the SPEED SERVO channel
+- the TailLeft & TailRight LEDs are in sync with the TurnLeft & TurnRight
 
 top view of the board
 ![top view of the board](https://github.com/MdeJong1970/Light-Control/blob/main/Pictures/LightControlTop.png)
@@ -34,6 +42,14 @@ The size is 30mm x 70mm.
 - pin D8  - Forward/Backward channel
 - pin D9  - Steering channel
 - pin D10 - HeadLight channel 
+
+## Connection of the board
+
+Connection of the board
+![Connection of the board](https://github.com/MdeJong1970/Light-Control/blob/main/Pictures/LightControlTop%20-%20Connections.png)
+
+Connection of the LEDs
+![Connection of the LEDs](https://github.com/MdeJong1970/Light-Control/blob/main/Pictures/ULN2803A%20connection.webp)
 
 ## Small holder for the board
 
