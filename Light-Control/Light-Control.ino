@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <Servo.h>
 
 typedef enum
 {
@@ -12,6 +13,7 @@ typedef enum
 
 #define SERVO_LOW  1400
 #define SERVO_HIGH 1600
+#define SERVO_MIN  1000
 #define SERVO_MAX  2200
 
 #define LED_ON HIGH
@@ -20,35 +22,42 @@ typedef enum
 #define TURN_PERIODE 25000
 
 // PPM read from receiver
-#define speedPPM D8 //PPM input for INT3, Froward/Backward channel
-#define steerPPM D9 //PPM input for INT0, Steering channel
-#define Light_btnPPM D10 //PPM input for INT1, HeadLight door open channel 
+#define speedPPM D8       //PPM input D8, Forward/Backward channel
+#define steerPPM D9       //PPM input D9, Steering channel
+#define Light_btnPPM D10  //PPM input D10, HeadLight channel 
 
 // Numbers of pins on Arduino Micro for LEDs control
-#define HeadLight D0  // pin 8 - 5mm white HeadLight LEDs
-#define ReverseLight D1 // pin A3 - Reverse - 3mm white LEDs on tail panel
-#define TurnLeft D2 // pin 4 - Left turn signals
-#define TurnRight D3 // pin 6 - Right turn signals
-#define TailLeft D4 // pin 10 - Tail lamp Left
-#define TailRight D5 // pin 9 - Tail lamp Right
-#define BreakLight D6 // pin 9 - Tail lamp Right
+#define HeadLight D0      // pin D0 - 5mm white HeadLight LEDs
+#define ReverseLight D1   // pin D1 - Reverse - 3mm white LEDs on tail panel
+#define TurnLeft D2       // pin D2 - Left turn signals
+#define TurnRight D3      // pin D3 - Right turn signals
+#define TailLeft D4       // pin D4 - Tail lamp Left
+#define TailRight D5      // pin D5 - Tail lamp Right
+#define BreakLight D6     // pin D6 - Break lamp
+
+#define HeadLightServo D7 // pin D6 - Head Light Cover Servo
+#define HEAD_LIGHT_OPEN 0
+#define HEAD_LIGHT_CLOSED 90
 
 volatile servo_pos_t speed_servo;
 volatile servo_pos_t steer_servo;
 volatile servo_pos_t Light_btn_servo;
 
-int Tail_Light_min=0; //variable indicating the operating modes of the rear lamps.
+// Head Light Cover Servo
+Servo HeadLight_servo;
+
 // Variables for reading signals from receiver
 volatile unsigned long lt1, ct1, ms_spd, tmp1;
 volatile unsigned long lt2, ct2, ms_steer,tmp2;
 volatile unsigned long lt3, ct3, ms_Light_btn, tmp3;
 
-// Variables for light, turn signals, reverse
+// Variables for Head light, turn signals, reverse
 volatile bool light_on;
 volatile bool reverse_on;
 volatile bool turn_left;
 volatile bool turn_right;
 
+// variable for blinking timing
 volatile unsigned long turn_left_time;
 volatile unsigned long turn_right_time;
 
@@ -104,6 +113,9 @@ void setup(){
   attachInterrupt( digitalPinToInterrupt(speedPPM), speedPPM_int, CHANGE);
   attachInterrupt( digitalPinToInterrupt(Light_btnPPM), Light_btnPPM_int, CHANGE);
 
+  // attach HeadLight servo 
+  HeadLight_servo.attach(HeadLightServo);
+
   speed_servo = SERVO_CENTRAL;
   steer_servo = SERVO_CENTRAL;
   Light_btn_servo = SERVO_CENTRAL;
@@ -158,6 +170,7 @@ void loop()
   if( light_on == true )
   {
     digitalWrite( HeadLight, HIGH );
+    HeadLight_servo.write( HEAD_LIGHT_OPEN );
     if( turn_left == false )
     {
       digitalWrite( TailLeft, HIGH );
@@ -170,6 +183,7 @@ void loop()
   else
   {
     digitalWrite( HeadLight, LOW );
+    HeadLight_servo.write( HEAD_LIGHT_CLOSED );
     if( turn_left == false )
     {
       digitalWrite( TailLeft, LOW );
@@ -190,7 +204,7 @@ void loop()
     digitalWrite( ReverseLight, LOW );
   }
   
-  //Handle blink timing
+  //Handle blinking left timing
   if( turn_left == true )
   {
     turn_left_time++;
@@ -204,6 +218,7 @@ void loop()
     turn_left_time = 0;
   }
 
+  //Handle blinking right timing
   if( turn_right == true )
   {
     turn_right_time++;
@@ -275,28 +290,34 @@ void loop()
 // Reading signals from 3 channels
 void speedPPM_int() 
 {    // PPM read interrupt
- ct1 = micros(); // read current time
- ms_spd=ct1-lt1; // ms = current time - last time
- lt1=ct1; // last time
- if(ms_spd>SERVO_MAX)  // fix time bug 
-   ms_spd=tmp1;        // fix time bug
-   tmp1=ms_spd;        // fix time bug
+  ct1 = micros(); // read current time
+  ms_spd=ct1-lt1; // ms = current time - last time
+  lt1=ct1; // last time
+  if( (ms_spd>SERVO_MAX) || (ms_spd<SERVO_MIN) )
+  {
+    ms_spd=tmp1;
+  }
+  tmp1=ms_spd;
 }    
 void steerPPM_int() 
 {
- ct2 = micros();
- ms_steer=ct2-lt2;
- lt2=ct2;
- if(ms_steer>SERVO_MAX)
-   ms_steer=tmp2;
-   tmp2=ms_steer;
+  ct2 = micros();
+  ms_steer=ct2-lt2;
+  lt2=ct2;
+  if( (ms_steer>SERVO_MAX) || (ms_steer<SERVO_MIN) )
+  {
+    ms_steer=tmp2;
+  }
+  tmp2=ms_steer;
 }
 void Light_btnPPM_int() 
 {
- ct3 = micros();
- ms_Light_btn=ct3-lt3;
- lt3=ct3; // last time
- if(ms_Light_btn>SERVO_MAX)
-   ms_Light_btn=tmp3;
-   tmp3=ms_Light_btn;
+  ct3 = micros();
+  ms_Light_btn=ct3-lt3;
+  lt3=ct3; // last time
+  if( (ms_Light_btn>SERVO_MAX) || (ms_Light_btn<SERVO_MIN) )
+  {
+    ms_Light_btn=tmp3;
+  }
+  tmp3=ms_Light_btn;
 }
