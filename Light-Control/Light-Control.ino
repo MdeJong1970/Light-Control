@@ -47,7 +47,7 @@ volatile servo_pos_t Light_btn_servo;
 Servo HeadLight_servo;
 
 // Variables for reading signals from receiver
-volatile unsigned long lt1, ct1, ms_spd, tmp1;
+volatile unsigned long lt1, ct1, ms_speed, tmp1;
 volatile unsigned long lt2, ct2, ms_steer,tmp2;
 volatile unsigned long lt3, ct3, ms_Light_btn, tmp3;
 
@@ -125,7 +125,7 @@ void setup(){
 void loop()
 {
   //convert servo puls values to servo status
-  speed_servo = eval_servo( ms_spd );
+  speed_servo = eval_servo( ms_speed );
   steer_servo = eval_servo( ms_steer );
   Light_btn_servo = eval_servo( ms_Light_btn );
 
@@ -139,7 +139,7 @@ void loop()
     light_on = false;
   }
 
-  if( speed_servo == SERVO_LOW )
+  if( speed_servo == SERVO_RIGHT )
   {
     reverse_on = true;
   }
@@ -291,13 +291,13 @@ void loop()
 void speedPPM_int() 
 {    // PPM read interrupt
   ct1 = micros(); // read current time
-  ms_spd=ct1-lt1; // ms = current time - last time
+  ms_speed=ct1-lt1; // ms = current time - last time
   lt1=ct1; // last time
-  if( (ms_spd>SERVO_MAX) || (ms_spd<SERVO_MIN) )
+  if( (ms_speed>SERVO_MAX) || (ms_speed<SERVO_MIN) )
   {
-    ms_spd=tmp1;
+    ms_speed=tmp1;
   }
-  tmp1=ms_spd;
+  tmp1=ms_speed;
 }    
 void steerPPM_int() 
 {
